@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Aurora, Colorado City Guide"
+description = "A friendly one-page guide to Aurora, Colorado, with local food, quick facts, civic leadership, the state bird, and a personal list of favorite things."
+version = "1.0.0"
+id = "artifacts/aurora-city-guide"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25750
+
+[services.development]
+run = "pnpm --filter @workspace/aurora-city-guide run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/aurora-city-guide", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/aurora-city-guide/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25750"
+BASE_PATH = "/"
