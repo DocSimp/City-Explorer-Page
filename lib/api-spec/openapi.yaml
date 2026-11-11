@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: chat
+    description: Aurora city guide chat operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,56 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /chat:
+    post:
+      operationId: sendCityChat
+      tags: [chat]
+      summary: Ask the Aurora city guide
+      description: Returns a city-focused answer using the requested generation settings.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequest"
+      responses:
+        "200":
+          description: City guide reply
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponse"
+        "400":
+          description: Invalid chat request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: The guide could not reach its AI provider
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Gemini API configuration is missing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /chat/system-prompt:
+    get:
+      operationId: getCitySystemPrompt
+      tags: [chat]
+      summary: Get the city guide system prompt
+      description: Returns the instructions currently used by the Aurora city guide.
+      responses:
+        "200":
+          description: Current system prompt
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatSystemPrompt"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +85,110 @@ components:
           type: string
       required:
         - status
+    ChatRequest:
+      type: object
+      properties:
+        message:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        history:
+          type: array
+          maxItems: 12
+          items:
+            $ref: "#/components/schemas/ChatHistoryItem"
+        settings:
+          $ref: "#/components/schemas/ChatSettingsInput"
+      required:
+        - message
+    ChatHistoryItem:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [user, model]
+        content:
+          type: string
+          minLength: 1
+          maxLength: 1000
+      required:
+        - role
+        - content
+    ChatSettingsInput:
+      type: object
+      properties:
+        temperature:
+          type: number
+          minimum: 0
+          maximum: 2
+        topP:
+          type: number
+          minimum: 0
+          maximum: 1
+        maxOutputTokens:
+          type: integer
+          minimum: 32
+          maximum: 1024
+    ChatSettings:
+      type: object
+      properties:
+        temperature:
+          type: number
+        topP:
+          type: number
+        maxOutputTokens:
+          type: integer
+      required:
+        - temperature
+        - topP
+        - maxOutputTokens
+    ChatUsage:
+      type: object
+      properties:
+        inputTokens:
+          type: ["integer", "null"]
+          minimum: 0
+        outputTokens:
+          type: ["integer", "null"]
+          minimum: 0
+        totalTokens:
+          type: ["integer", "null"]
+          minimum: 0
+        truncated:
+          type: boolean
+      required:
+        - inputTokens
+        - outputTokens
+        - totalTokens
+        - truncated
+    ChatResponse:
+      type: object
+      properties:
+        reply:
+          type: string
+        usage:
+          $ref: "#/components/schemas/ChatUsage"
+        settings:
+          $ref: "#/components/schemas/ChatSettings"
+        model:
+          type: string
+      required:
+        - reply
+        - usage
+        - settings
+        - model
+    ChatSystemPrompt:
+      type: object
+      properties:
+        systemPrompt:
+          type: string
+      required:
+        - systemPrompt
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
 

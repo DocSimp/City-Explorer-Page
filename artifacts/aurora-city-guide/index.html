@@ -25,6 +25,7 @@
         <a href="#quick-facts-title">Quick facts</a>
         <a href="#food-title">At the table</a>
         <a href="#likes-title">Your notes</a>
+          <a href="#chat-title">Ask the guide</a>
       </nav>
       <span class="edition">A city, in a few details · No. 01</span>
     </header>
@@ -123,6 +124,75 @@
           <ul class="likes-list" id="likes-list" aria-live="polite">
             <li class="list-empty" id="empty-message">Your list starts with you.</li>
           </ul>
+        </div>
+      </section>
+
+      <section class="guide-chat page-shell" id="guide-chat" aria-labelledby="chat-title">
+        <div class="chat-intro">
+          <div class="section-kicker">04 / Ask around</div>
+          <h2 id="chat-title">A local voice,<br /><span>on your terms.</span></h2>
+          <p>This is an AI guide for Aurora. Ask about a neighborhood, a meal, or how to spend an afternoon. Check important details before you go.</p>
+          <div class="chat-orbit" aria-hidden="true"><span>ASK</span><i></i></div>
+        </div>
+
+        <div class="chat-workspace">
+          <section class="prompt-lab" aria-labelledby="prompt-lab-title">
+            <div class="lab-heading">
+              <div>
+                <div class="section-kicker">Prompt Lab</div>
+                <h3 id="prompt-lab-title">Tune the reply</h3>
+              </div>
+              <span class="lab-mark" aria-hidden="true">01</span>
+            </div>
+            <p class="lab-description">Adjust how the guide responds. These settings apply to your next question.</p>
+
+            <div class="range-control">
+              <label for="temperature">Temperature <output id="temperature-value" for="temperature">1.0</output></label>
+              <input id="temperature" name="temperature" type="range" min="0" max="2" step="0.1" value="1" />
+              <div class="range-ends"><span>Focused</span><span>More varied</span></div>
+            </div>
+            <div class="range-control">
+              <label for="top-p">Top P <output id="top-p-value" for="top-p">0.95</output></label>
+              <input id="top-p" name="topP" type="range" min="0" max="1" step="0.01" value="0.95" />
+              <div class="range-ends"><span>Narrow</span><span>Broad</span></div>
+            </div>
+            <div class="range-control">
+              <label for="max-output-tokens">Max output tokens <output id="max-output-tokens-value" for="max-output-tokens">300</output></label>
+              <input id="max-output-tokens" name="maxOutputTokens" type="range" min="32" max="1024" step="1" value="300" />
+              <div class="range-ends"><span>Short</span><span>Long</span></div>
+            </div>
+
+            <details class="system-prompt">
+              <summary>View system prompt</summary>
+              <pre id="system-prompt-content" aria-live="polite">Loading the guide’s instructions…</pre>
+            </details>
+          </section>
+
+          <section class="chat-panel" aria-label="Aurora guide chat">
+            <div class="chat-panel-head">
+              <div>
+                <span class="chat-live-dot" aria-hidden="true"></span>
+                <span class="chat-state-title">Aurora guide</span>
+              </div>
+              <button class="chat-clear" id="clear-chat" type="button" disabled>Clear chat</button>
+            </div>
+            <p class="chat-note">A thoughtful starting point, not a substitute for current local information.</p>
+            <ol class="chat-transcript" id="chat-transcript" aria-label="Conversation" aria-live="polite" aria-relevant="additions text">
+              <li class="chat-welcome" id="chat-welcome">
+                <span class="message-overline">FIELD NOTE 01</span>
+                <p>What are you curious about? I can help you find a starting point in Aurora.</p>
+              </li>
+            </ol>
+            <p class="chat-status" id="chat-status" role="status" aria-live="polite"></p>
+            <form class="chat-form" id="chat-form">
+              <label for="chat-message">Your question</label>
+              <textarea id="chat-message" name="message" rows="2" maxlength="1000" placeholder="Ask about food, places, or a day in Aurora…" required></textarea>
+              <div class="chat-form-foot">
+                <span>Up to 1,000 characters</span>
+                <button id="send-message" type="submit"><span>Ask the guide</span><span aria-hidden="true">↗</span></button>
+              </div>
+            </form>
+          </section>
         </div>
       </section>
     </main>
