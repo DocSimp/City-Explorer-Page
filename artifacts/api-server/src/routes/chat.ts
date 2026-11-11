@@ -38,7 +38,8 @@ router.post("/chat", async (req, res): Promise<void> => {
     return;
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  // Prefer the documented name, while accepting the existing Replit secret alias.
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GeminiKey;
   if (!apiKey) {
     req.log.warn("Gemini API key is not configured");
     res.status(503).json(
@@ -69,7 +70,10 @@ router.post("/chat", async (req, res): Promise<void> => {
   ];
 
   try {
-    const ai = new GoogleGenAI({ apiKey });
+    const ai = new GoogleGenAI({
+      apiKey,
+      httpOptions: { timeout: 20_000 },
+    });
     const response = await ai.models.generateContent({
       model,
       contents,
@@ -111,9 +115,25 @@ router.post("/chat", async (req, res): Promise<void> => {
         model,
       }),
     );
-  } catch {
-    // Keep provider details and credentials out of responses and logs.
-    req.log.error("Gemini chat request failed");
+  } catch (error) {
+    // Log only safe diagnostics; never log provider messages or credentials.
+    const providerError =
+      error && typeof error === "object"
+        ? (error as { status?: unknown; statusCode?: unknown })
+        : {};
+    const providerStatus =
+      typeof providerError.status === "number"
+        ? providerError.status
+        : typeof providerError.statusCode === "number"
+          ? providerError.statusCode
+          : undefined;
+    req.log.error(
+      {
+        providerErrorName: error instanceof Error ? error.name : "UnknownError",
+        providerStatus,
+      },
+      "Gemini chat request failed",
+    );
     res.status(502).json(
       makeErrorResponse(
         "The guide could not reach Gemini. Please try again in a moment.",
