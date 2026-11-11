@@ -73,6 +73,7 @@ router.post("/chat", async (req, res): Promise<void> => {
       model,
       max_tokens: settings.maxOutputTokens,
       system: citySystemPrompt,
+      thinking: { type: "between_tools" },
       messages,
     });
 

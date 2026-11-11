@@ -1,0 +1,1 @@
+- [Claude Prompt Lab settings](claude-prompt-lab-settings.md) — Show only controls supported by the active Claude model; retain max output tokens.

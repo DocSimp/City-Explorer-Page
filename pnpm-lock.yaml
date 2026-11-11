@@ -178,6 +178,9 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ^1.8.0
         version: 1.8.0(zod@4.6.5)
+      '@opentelemetry/api':
+        specifier: ^1.10.0
+        version: 1.10.0
       '@workspace/api-zod':
         specifier: workspace:*
         version: link:../../lib/api-zod
