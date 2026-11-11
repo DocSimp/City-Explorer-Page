@@ -9,7 +9,7 @@
 export interface ChatSettingsInput {
   /**
      * @minimum 0
-     * @maximum 2
+     * @maximum 1
      */
   temperature?: number;
   /**

@@ -14,7 +14,7 @@ export type ChatHistoryItemRole = typeof ChatHistoryItemRole[keyof typeof ChatHi
 
 export const ChatHistoryItemRole = {
   user: 'user',
-  model: 'model',
+  assistant: 'assistant',
 } as const;
 
 export interface ChatHistoryItem {
@@ -29,7 +29,7 @@ export interface ChatHistoryItem {
 export interface ChatSettingsInput {
   /**
      * @minimum 0
-     * @maximum 2
+     * @maximum 1
      */
   temperature?: number;
   /**

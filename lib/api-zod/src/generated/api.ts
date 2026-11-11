@@ -28,7 +28,7 @@ export const sendCityChatBodyHistoryItemContentMax = 1000;
 export const sendCityChatBodyHistoryMax = 12;
 
 export const sendCityChatBodySettingsTemperatureMin = 0;
-export const sendCityChatBodySettingsTemperatureMax = 2;
+export const sendCityChatBodySettingsTemperatureMax = 1;
 
 export const sendCityChatBodySettingsTopPMin = 0;
 export const sendCityChatBodySettingsTopPMax = 1;
@@ -41,7 +41,7 @@ export const sendCityChatBodySettingsMaxOutputTokensMax = 1024;
 export const SendCityChatBody = zod.object({
   "message": zod.string().min(1).max(sendCityChatBodyMessageMax),
   "history": zod.array(zod.object({
-  "role": zod.enum(['user', 'model']),
+  "role": zod.enum(['user', 'assistant']),
   "content": zod.string().min(1).max(sendCityChatBodyHistoryItemContentMax)
 })).max(sendCityChatBodyHistoryMax).optional(),
   "settings": zod.object({

@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import Anthropic from "@anthropic-ai/sdk";
 import {
   GetCitySystemPromptResponse,
   SendCityChatBody,
@@ -16,7 +16,7 @@ const defaultSettings = {
   maxOutputTokens: 300,
 } as const;
 
-const defaultModel = "gemini-3.8-flash";
+const defaultModel = "claude-sonnet-4-6";
 
 function makeErrorResponse(error: string): ErrorResponse {
   return { error };
@@ -27,7 +27,7 @@ router.get("/chat/system-prompt", (_req, res) => {
 });
 
 router.post("/chat", async (req, res): Promise<void> => {
-  // Validate the full request before checking configuration or calling Gemini.
+  // Validate the full request before checking configuration or calling Claude.
   const parsed = SendCityChatBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json(
@@ -38,13 +38,12 @@ router.post("/chat", async (req, res): Promise<void> => {
     return;
   }
 
-  // Prefer the documented name, while accepting the existing Replit secret alias.
-  const apiKey = process.env.GEMINI_API_KEY || process.env.GeminiKey;
+  const apiKey = process.env.Claude_API_Key;
   if (!apiKey) {
-    req.log.warn("Gemini API key is not configured");
+    req.log.warn("Claude API key is not configured");
     res.status(503).json(
       makeErrorResponse(
-        "Add a GEMINI_API_KEY secret in Replit Secrets and restart the API server to enable the city guide.",
+        "Add a Claude_API_Key secret in Replit Secrets and restart the API server to enable the city guide.",
       ),
     );
     return;
@@ -57,37 +56,39 @@ router.post("/chat", async (req, res): Promise<void> => {
     maxOutputTokens:
       requestedSettings.maxOutputTokens ?? defaultSettings.maxOutputTokens,
   };
-  const model = process.env.GEMINI_MODEL || defaultModel;
-  const contents = [
+  const model = process.env.CLAUDE_MODEL || defaultModel;
+  const messages = [
     ...(parsed.data.history ?? []).map(({ role, content }) => ({
       role,
-      parts: [{ text: content }],
+      content,
     })),
     {
       role: "user" as const,
-      parts: [{ text: parsed.data.message }],
+      content: parsed.data.message,
     },
   ];
 
   try {
-    const ai = new GoogleGenAI({
+    const anthropic = new Anthropic({
       apiKey,
-      httpOptions: { timeout: 20_000 },
+      timeout: 20_000,
     });
-    const response = await ai.models.generateContent({
+    const response = await anthropic.messages.create({
       model,
-      contents,
-      config: {
-        systemInstruction: citySystemPrompt,
-        temperature: settings.temperature,
-        topP: settings.topP,
-        maxOutputTokens: settings.maxOutputTokens,
-      },
+      max_tokens: settings.maxOutputTokens,
+      system: citySystemPrompt,
+      temperature: settings.temperature,
+      top_p: settings.topP,
+      messages,
     });
 
-    const reply = response.text?.trim();
+    const reply = response.content
+      .filter((block) => block.type === "text")
+      .map((block) => block.text)
+      .join("\n")
+      .trim();
     if (!reply) {
-      req.log.warn("Gemini returned no text");
+      req.log.warn("Claude returned no text");
       res.status(502).json(
         makeErrorResponse(
           "The guide could not create a reply. Please try another question.",
@@ -96,23 +97,20 @@ router.post("/chat", async (req, res): Promise<void> => {
       return;
     }
 
-    const usage = response.usageMetadata;
-    const truncated =
-      response.candidates?.some(
-        (candidate) => candidate.finishReason === "MAX_TOKENS",
-      ) ?? false;
+    const inputTokens = response.usage.input_tokens;
+    const outputTokens = response.usage.output_tokens;
 
     res.json(
       SendCityChatResponse.parse({
         reply,
         usage: {
-          inputTokens: usage?.promptTokenCount ?? null,
-          outputTokens: usage?.candidatesTokenCount ?? null,
-          totalTokens: usage?.totalTokenCount ?? null,
-          truncated,
+          inputTokens,
+          outputTokens,
+          totalTokens: inputTokens + outputTokens,
+          truncated: response.stop_reason === "max_tokens",
         },
         settings,
-        model,
+        model: response.model,
       }),
     );
   } catch (error) {
@@ -132,11 +130,11 @@ router.post("/chat", async (req, res): Promise<void> => {
         providerErrorName: error instanceof Error ? error.name : "UnknownError",
         providerStatus,
       },
-      "Gemini chat request failed",
+      "Claude chat request failed",
     );
     res.status(502).json(
       makeErrorResponse(
-        "The guide could not reach Gemini. Please try again in a moment.",
+        "The guide could not reach Claude. Please try again in a moment.",
       ),
     );
   }

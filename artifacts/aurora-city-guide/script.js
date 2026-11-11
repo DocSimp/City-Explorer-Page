@@ -107,7 +107,7 @@ function addChatMessage(role, content, answerDetails) {
   copy.textContent = content;
   item.append(label, copy);
 
-  if (role === "model" && answerDetails) {
+  if (role === "assistant" && answerDetails) {
     const metadata = document.createElement("div");
     metadata.className = "answer-meta";
     metadata.setAttribute("aria-label", "Answer details");
@@ -176,8 +176,8 @@ function getRecentHistory() {
 
 function friendlyError(errorMessage, responseStatus) {
   const message = String(errorMessage || "");
-  if (/GEMINI_API_KEY|api.?key|not configured|configuration/i.test(message)) {
-    return "Add a GEMINI_API_KEY secret in Replit Secrets and restart the API server to enable the guide. Keep the key private.";
+  if (/CLAUDE_API_KEY|api.?key|not configured|configuration/i.test(message)) {
+    return "Add a Claude_API_Key secret in Replit Secrets and restart the API server to enable the guide. Keep the key private.";
   }
   if (responseStatus === 404) {
     return "The chat service is not available right now. Please try again later.";
@@ -231,8 +231,8 @@ chatForm.addEventListener("submit", async (event) => {
       throw Object.assign(new Error("The response was empty"), { status: response.status });
     }
 
-    conversation.push({ role: "user", content: message }, { role: "model", content: data.reply });
-    addChatMessage("model", data.reply, {
+    conversation.push({ role: "user", content: message }, { role: "assistant", content: data.reply });
+    addChatMessage("assistant", data.reply, {
       model: data.model,
       settings: data.settings || getSettings(),
       usage: data.usage,

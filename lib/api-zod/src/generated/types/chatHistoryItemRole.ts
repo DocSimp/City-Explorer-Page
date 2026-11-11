@@ -11,5 +11,5 @@ export type ChatHistoryItemRole = typeof ChatHistoryItemRole[keyof typeof ChatHi
 
 export const ChatHistoryItemRole = {
   user: 'user',
-  model: 'model',
+  assistant: 'assistant',
 } as const;
