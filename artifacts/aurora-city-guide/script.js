@@ -70,25 +70,17 @@ const systemPromptContent = document.querySelector("#system-prompt-content");
 const conversation = [];
 let isSending = false;
 
-const temperatureInput = document.querySelector("#temperature");
-const topPInput = document.querySelector("#top-p");
 const maxTokensInput = document.querySelector("#max-output-tokens");
 
-// Keep the slider values visible as they move, and send them as numbers.
+// Keep the output limit visible as it moves, and send it as a number.
 function syncSettingLabels() {
-  document.querySelector("#temperature-value").textContent = Number(temperatureInput.value).toFixed(1);
-  document.querySelector("#top-p-value").textContent = Number(topPInput.value).toFixed(2);
   document.querySelector("#max-output-tokens-value").textContent = maxTokensInput.value;
 }
 
-[temperatureInput, topPInput, maxTokensInput].forEach((input) => {
-  input.addEventListener("input", syncSettingLabels);
-});
+maxTokensInput.addEventListener("input", syncSettingLabels);
 
 function getSettings() {
   return {
-    temperature: Number(temperatureInput.value),
-    topP: Number(topPInput.value),
     maxOutputTokens: Number(maxTokensInput.value),
   };
 }
@@ -118,7 +110,7 @@ function addChatMessage(role, content, answerDetails) {
       ? answerDetails.settings
       : {};
     const settingsLine = document.createElement("span");
-    settingsLine.textContent = `Settings: temperature ${settings.temperature ?? "—"} · top P ${settings.topP ?? "—"} · max output ${settings.maxOutputTokens ?? "—"}`;
+    settingsLine.textContent = `Max output tokens: ${settings.maxOutputTokens ?? "—"}`;
     const usage = answerDetails.usage && typeof answerDetails.usage === "object"
       ? answerDetails.usage
       : {};

@@ -11,12 +11,10 @@ import { citySystemPrompt } from "../city";
 const router: IRouter = Router();
 
 const defaultSettings = {
-  temperature: 1,
-  topP: 0.95,
   maxOutputTokens: 300,
 } as const;
 
-const defaultModel = "claude-sonnet-4-6";
+const defaultModel = "claude-sonnet-5-5";
 
 function makeErrorResponse(error: string): ErrorResponse {
   return { error };
@@ -51,8 +49,6 @@ router.post("/chat", async (req, res): Promise<void> => {
 
   const requestedSettings = parsed.data.settings ?? {};
   const settings = {
-    temperature: requestedSettings.temperature ?? defaultSettings.temperature,
-    topP: requestedSettings.topP ?? defaultSettings.topP,
     maxOutputTokens:
       requestedSettings.maxOutputTokens ?? defaultSettings.maxOutputTokens,
   };
@@ -77,8 +73,6 @@ router.post("/chat", async (req, res): Promise<void> => {
       model,
       max_tokens: settings.maxOutputTokens,
       system: citySystemPrompt,
-      temperature: settings.temperature,
-      top_p: settings.topP,
       messages,
     });
 
@@ -109,7 +103,7 @@ router.post("/chat", async (req, res): Promise<void> => {
           totalTokens: inputTokens + outputTokens,
           truncated: response.stop_reason === "max_tokens",
         },
-        settings,
+        settings: { maxOutputTokens: settings.maxOutputTokens },
         model: response.model,
       }),
     );

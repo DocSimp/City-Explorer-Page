@@ -27,12 +27,6 @@ export const sendCityChatBodyHistoryItemContentMax = 1000;
 
 export const sendCityChatBodyHistoryMax = 12;
 
-export const sendCityChatBodySettingsTemperatureMin = 0;
-export const sendCityChatBodySettingsTemperatureMax = 1;
-
-export const sendCityChatBodySettingsTopPMin = 0;
-export const sendCityChatBodySettingsTopPMax = 1;
-
 export const sendCityChatBodySettingsMaxOutputTokensMin = 32;
 export const sendCityChatBodySettingsMaxOutputTokensMax = 1024;
 
@@ -45,8 +39,6 @@ export const SendCityChatBody = zod.object({
   "content": zod.string().min(1).max(sendCityChatBodyHistoryItemContentMax)
 })).max(sendCityChatBodyHistoryMax).optional(),
   "settings": zod.object({
-  "temperature": zod.number().min(sendCityChatBodySettingsTemperatureMin).max(sendCityChatBodySettingsTemperatureMax).optional(),
-  "topP": zod.number().min(sendCityChatBodySettingsTopPMin).max(sendCityChatBodySettingsTopPMax).optional(),
   "maxOutputTokens": zod.number().int().min(sendCityChatBodySettingsMaxOutputTokensMin).max(sendCityChatBodySettingsMaxOutputTokensMax).optional()
 }).optional()
 })
@@ -68,8 +60,6 @@ export const SendCityChatResponse = zod.object({
   "truncated": zod.boolean()
 }),
   "settings": zod.object({
-  "temperature": zod.number(),
-  "topP": zod.number(),
   "maxOutputTokens": zod.number().int()
 }),
   "model": zod.string()

@@ -28,16 +28,6 @@ export interface ChatHistoryItem {
 
 export interface ChatSettingsInput {
   /**
-     * @minimum 0
-     * @maximum 1
-     */
-  temperature?: number;
-  /**
-     * @minimum 0
-     * @maximum 1
-     */
-  topP?: number;
-  /**
      * @minimum 32
      * @maximum 1024
      */
@@ -56,8 +46,6 @@ export interface ChatRequest {
 }
 
 export interface ChatSettings {
-  temperature: number;
-  topP: number;
   maxOutputTokens: number;
 }
 

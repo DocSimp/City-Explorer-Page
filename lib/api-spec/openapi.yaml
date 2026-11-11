@@ -117,14 +117,6 @@ components:
     ChatSettingsInput:
       type: object
       properties:
-        temperature:
-          type: number
-          minimum: 0
-          maximum: 1
-        topP:
-          type: number
-          minimum: 0
-          maximum: 1
         maxOutputTokens:
           type: integer
           minimum: 32
@@ -132,15 +124,9 @@ components:
     ChatSettings:
       type: object
       properties:
-        temperature:
-          type: number
-        topP:
-          type: number
         maxOutputTokens:
           type: integer
       required:
-        - temperature
-        - topP
         - maxOutputTokens
     ChatUsage:
       type: object

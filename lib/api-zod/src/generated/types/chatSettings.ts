@@ -7,7 +7,5 @@
  */
 
 export interface ChatSettings {
-  temperature: number;
-  topP: number;
   maxOutputTokens: number;
 }
